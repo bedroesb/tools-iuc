@@ -10,34 +10,21 @@
         <requirement type="package" version="5.3">pyyaml</requirement>
     </requirements>
     <command detect_errors="exit_code"><![CDATA[
+
 #if $dry_run == "True":
-    #set $credentials='./test_fake_path';
+    #set $credentials='test_fake_path';
     touch $credentials;
     echo "username:test_user" >> $credentials;
     echo "password:test_password" >> $credentials;
-#end if
-
-webin_id=`grep 'username' $credentials | cut -d':' -f2,2`;
+#else
+webin_id=`grep 'username' $credentials`;
 if [ "\$webin_id" = "" ]; then
-  ## No credentials in user defined preferences    
-  ## Fallback to global defined credentials (if exist)   
-  #import os
-  #if os.path.isfile(os.environ.get('GALAXY_ENA_SECRETS', '')):
-      credentials_path=\${GALAXY_ENA_SECRETS};     
-      webin_id=`grep 'username' \$GALAXY_ENA_SECRETS | cut -d':' -f2,2` | sed -e 's/^[[:space:]]*//'`;
-      password=`grep 'password' \$GALAXY_ENA_SECRETS | cut -d':' -f2,2` | sed -e 's/^[[:space:]]*//'`;
-      if [ "\$webin_id" = "" ]; then
-          echo "No global credentials defined. Check your GALAXY_ENA_SECRETS file or set your credentials via: User -> Preferences -> Manage Information";
-          exit 1;
-      fi;
-  #else:
-      echo "No ENA credentials defined. Set your credentials via: User -> Preferences -> Manage Information";
-      exit 1;
-  #end if
+    echo "No ENA credentials defined. Set your credentials via: User -> Preferences -> Manage Information";
+    exit 1;
 else
-  password=`grep 'password' $credentials | cut -d':' -f2,2`;
+  credentials_path='$credentials';
 fi;
-
+#end if
 
 ## create a manifest base file with the parameters that are identical for all sequences that will be submited (if submitting a multifasta)
 #set $manifest_base = 'manifest_base.tab'
