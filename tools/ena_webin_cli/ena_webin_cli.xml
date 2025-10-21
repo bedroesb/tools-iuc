@@ -20,10 +20,6 @@ echo "Initializing log and credentials";
 
 ## Default path where the <configfile name="credentials"> content will be written.
 ## In dry-run we override this with a fake file so tests don’t require real creds.
-#if $dry_run == "true":
-    echo "username:test_user" > "$credentials";
-    echo "password:test_password" >> "$credentials";
-#end if
 
 ## Extract username/password from the credentials file.
 ## NOTE: $webin_id appears in bash, so we escape it as \$webin_id.
@@ -218,6 +214,14 @@ tar -cf $webin_cli_outputs $outputs_dir ;
 username:$webin_id
 password:$password
 #end if
+#if $dry_run == "true":
+   #set $username = "test_user"
+   #set $password = "test_password"
+#end if
+{
+    "username": "$username",
+    "password": "$password"
+}
         ]]></configfile>
 
         <!-- genome_fasta_files:
